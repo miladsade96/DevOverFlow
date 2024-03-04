@@ -2,7 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "../styles/globals.css";
 import React from "react";
 import { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google"; // eslint-disable-line
 import { ThemeProvider } from "@/context/ThemeProvider";
 
 const inter = Inter({
