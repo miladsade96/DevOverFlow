@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SignedOut } from "@clerk/nextjs";
-import { SheetClose } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 export default function LeftSidebar() {
