@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Navbar from "@/components/shared/navbar/Navbar";
 import LeftSidebar from "@/components/LeftSidebar";
+import RightSidebar from "@/components/RightSidebar";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -11,7 +12,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <section className="flex min-h-screen flex-1 flex-col px-6 pb-6 pt-36 max-md:pb-14 sm:px-14">
           <div className="mx-auto w-full max-w-5xl">{children}</div>
         </section>
-        Right Sidebar
+        <RightSidebar />
       </div>
       Toaster
     </main>
