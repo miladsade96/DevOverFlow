@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import RenderTag from "@/components/RenderTag";
+import RenderTag from "@/components/shared/RenderTag";
 
 export default function RightSidebar() {
   const topQuestions = [
