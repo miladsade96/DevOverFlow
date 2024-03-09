@@ -21,7 +21,7 @@ export default function Filter({
   containerClasses,
 }: FilterProps) {
   return (
-    <div className={`relative ${otherClasses}`}>
+    <div className={`relative ${containerClasses}`}>
       <Select>
         <SelectTrigger
           className={`${otherClasses} body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5`}
