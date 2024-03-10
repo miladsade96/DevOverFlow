@@ -4,6 +4,36 @@ import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import Filter from "@/components/shared/Filter";
 import { HomePageFilters } from "@/constants/filters";
 import HomeFilters from "@/components/home/HomeFilters";
+import NoResult from "@/components/shared/NoResult";
+
+const questions = [
+  {
+    _id: 1,
+    title: "How to build a functional component in react?",
+    tags: [
+      { _id: 1, name: "javascript" },
+      { _id: 2, name: "react" },
+    ],
+    author: "Milad Sadeghi",
+    upvotes: 10,
+    views: 100,
+    answers: 2,
+    createdAt: "2024-03-10",
+  },
+  {
+    _id: 2,
+    title: "What is nextJS?",
+    tags: [
+      { _id: 1, name: "react" },
+      { _id: 2, name: "nextjs" },
+    ],
+    author: "John Smith",
+    upvotes: 15,
+    views: 201,
+    answers: 1,
+    createdAt: "2024-02-12",
+  },
+];
 
 export default function Home() {
   return (
@@ -31,6 +61,20 @@ export default function Home() {
         />
       </div>
       <HomeFilters />
+      <div className="mt-10 flex w-full flex-col gap-6">
+        {questions.length > 0 ? (
+          questions.map((question) => "questionCard")
+        ) : (
+          <NoResult
+            title="There is no question to show"
+            description="Be the first to break the silence! 🚀 Ask a question and kickstart the
+        discussion. Out query could be the next big thing others learn from. Get
+        involved! 🪔"
+            link="/ask-question"
+            linkTitle="Ask a Question"
+          />
+        )}
+      </div>
     </>
   );
 }
