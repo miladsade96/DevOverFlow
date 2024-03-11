@@ -9,30 +9,30 @@ import QuestionCard from "@/components/cards/QuestionCard";
 
 const questions = [
   {
-    _id: 1,
+    _id: "1",
     title: "How to build a functional component in react?",
     tags: [
-      { _id: 1, name: "javascript" },
-      { _id: 2, name: "react" },
+      { _id: "1", name: "javascript" },
+      { _id: "2", name: "react" },
     ],
-    author: "Milad Sadeghi",
-    upvotes: 10,
-    views: 100,
-    answers: 2,
-    createdAt: "2024-03-10",
+    author: { _id: "1", name: "Milad Sadeghi", picture: "default.png" },
+    upvotes: 200300,
+    views: 1358993,
+    answers: [],
+    createdAt: new Date("2024-03-11"),
   },
   {
-    _id: 2,
+    _id: "2",
     title: "What is nextJS?",
     tags: [
-      { _id: 1, name: "react" },
-      { _id: 2, name: "nextjs" },
+      { _id: "1", name: "react" },
+      { _id: "2", name: "nextjs" },
     ],
-    author: "John Smith",
-    upvotes: 15,
-    views: 201,
-    answers: 1,
-    createdAt: "2024-02-12",
+    author: { _id: "2", name: "John Smith", picture: "default.png" }, // Added picture property with default value
+    upvotes: 233222,
+    views: 23009883,
+    answers: [],
+    createdAt: new Date("2024-03-10"),
   },
 ];
 
