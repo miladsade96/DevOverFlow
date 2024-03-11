@@ -4,25 +4,25 @@ import RenderTag from "@/components/shared/RenderTag";
 
 export default function RightSidebar() {
   const topQuestions = [
-    { _id: 1, title: "How to learn nextjs?" },
-    { _id: 2, title: "How to learn react" },
-    { _id: 3, title: "What are hooks in react?" },
+    { _id: "1", title: "How to learn nextjs?" },
+    { _id: "2", title: "How to learn react" },
+    { _id: "3", title: "What are hooks in react?" },
     {
-      _id: 4,
+      _id: "4",
       title: "Explain the use case of useImperativeHandle hook in react?",
     },
     {
-      _id: 5,
+      _id: "5",
       title: "What are the differences between SSG, CSR and SSR in nextjs?",
     },
   ];
 
   const popularTags = [
-    { _id: 1, name: "javascript", totalQuestions: 6 },
-    { _id: 2, name: "typescript", totalQuestions: 9 },
-    { _id: 3, name: "react", totalQuestions: 12 },
-    { _id: 4, name: "next", totalQuestions: 20 },
-    { _id: 5, name: "vue", totalQuestions: 10 },
+    { _id: "1", name: "javascript", totalQuestions: 6 },
+    { _id: "2", name: "typescript", totalQuestions: 9 },
+    { _id: "3", name: "react", totalQuestions: 12 },
+    { _id: "4", name: "next", totalQuestions: 20 },
+    { _id: "5", name: "vue", totalQuestions: 10 },
   ];
 
   return (
