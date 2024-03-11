@@ -5,6 +5,7 @@ import Filter from "@/components/shared/Filter";
 import { HomePageFilters } from "@/constants/filters";
 import HomeFilters from "@/components/home/HomeFilters";
 import NoResult from "@/components/shared/NoResult";
+import QuestionCard from "@/components/cards/QuestionCard";
 
 const questions = [
   {
@@ -63,7 +64,7 @@ export default function Home() {
       <HomeFilters />
       <div className="mt-10 flex w-full flex-col gap-6">
         {questions.length > 0 ? (
-          questions.map((question) => "questionCard")
+          questions.map((question) => <QuestionCard key={question._id} />)
         ) : (
           <NoResult
             title="There is no question to show"
