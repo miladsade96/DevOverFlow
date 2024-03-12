@@ -1,3 +1,7 @@
-export default function AskQuestion() {
-  return <div>Ask Question</div>;
+export default function Page() {
+  return (
+    <div>
+      <div></div>
+    </div>
+  );
 }
