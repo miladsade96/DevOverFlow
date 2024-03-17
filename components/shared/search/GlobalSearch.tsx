@@ -15,7 +15,6 @@ export default function GlobalSearch() {
         <Input
           type="text"
           placeholder="Seach globally..."
-          value=""
           className="paragraph-regular no-focus placeholder background-light800_darkgradient border-none shadow-none outline-none"
         />
       </div>

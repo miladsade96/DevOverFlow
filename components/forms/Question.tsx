@@ -21,12 +21,20 @@ import { Editor } from "@tinymce/tinymce-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { createQuestion } from "@/lib/actions/question.action";
+import { useRouter, usePathname } from "next/navigation";
 
 const type: any = "create";
 
-export default function Question() {
+interface QuestionProps {
+  mongoUserId: string;
+}
+
+export default function Question({ mongoUserId }: QuestionProps) {
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
+  const pathName = usePathname();
 
   const form = useForm<z.infer<typeof questionsSchema>>({
     resolver: zodResolver(questionsSchema),
@@ -40,7 +48,13 @@ export default function Question() {
   async function onSubmit(values: z.infer<typeof questionsSchema>) {
     setIsSubmitting(true);
     try {
-      await createQuestion({});
+      await createQuestion({
+        title: values.title,
+        content: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUserId),
+      });
+      router.push("/");
     } catch (error) {
       console.log(error);
     } finally {
