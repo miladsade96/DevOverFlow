@@ -6,37 +6,12 @@ import { HomePageFilters } from "@/constants/filters";
 import HomeFilters from "@/components/home/HomeFilters";
 import NoResult from "@/components/shared/NoResult";
 import QuestionCard from "@/components/cards/QuestionCard";
+import { getQuestions } from "@/lib/actions/question.action";
 
-const questions = [
-  {
-    _id: "1",
-    title: "How to build a functional component in react?",
-    tags: [
-      { _id: "1", name: "javascript" },
-      { _id: "2", name: "react" },
-    ],
-    author: { _id: "1", name: "Milad Sadeghi", picture: "default.png" },
-    upvotes: 200300,
-    views: 1358993,
-    answers: [],
-    createdAt: new Date("2024-03-11"),
-  },
-  {
-    _id: "2",
-    title: "What is nextJS?",
-    tags: [
-      { _id: "1", name: "react" },
-      { _id: "2", name: "nextjs" },
-    ],
-    author: { _id: "2", name: "John Smith", picture: "default.png" }, // Added picture property with default value
-    upvotes: 233222,
-    views: 23009883,
-    answers: [],
-    createdAt: new Date("2024-03-10"),
-  },
-];
+export default async function Home() {
+  const result = await getQuestions({});
+  console.log(result);
 
-export default function Home() {
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -52,7 +27,7 @@ export default function Home() {
           route="/"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
-          placeHolder="Search for questios"
+          placeHolder="Search for questions"
           otherClasses="flex-1"
         />
         <Filter
@@ -63,8 +38,8 @@ export default function Home() {
       </div>
       <HomeFilters />
       <div className="mt-10 flex w-full flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map((question) => (
+        {result.questions.length > 0 ? (
+          result.questions.map((question) => (
             <QuestionCard
               key={question._id}
               _id={question._id}

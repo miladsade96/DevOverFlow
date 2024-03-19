@@ -53,6 +53,7 @@ export default function Question({ mongoUserId }: QuestionProps) {
         content: values.explanation,
         tags: values.tags,
         author: JSON.parse(mongoUserId),
+        path: pathName,
       });
       router.push("/");
     } catch (error) {
@@ -75,7 +76,7 @@ export default function Question({ mongoUserId }: QuestionProps) {
         if (tagValue.length > 15) {
           return form.setError("tags", {
             type: "required",
-            message: "Tag must be less than 15 charactrs.",
+            message: "Tag must be less than 15 characters.",
           });
         }
         if (!field.value.includes(tagValue as never)) {
@@ -235,9 +236,9 @@ export default function Question({ mongoUserId }: QuestionProps) {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <>{type === "edit" ? "Editing" : "Posting"}</>
+            <>{type === "Edit" ? "Editing..." : "Posting..."}</>
           ) : (
-            <>{type === "create" ? "Edit question" : "Ask a question"}</>
+            <>{type === "Edit" ? "Edit Question" : "Ask a Question"}</>
           )}
         </Button>
       </form>

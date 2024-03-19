@@ -5,7 +5,7 @@ import RightSidebar from "@/components/shared/RightSidebar";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <main className="background-light850_dark100 relative">
+    <main className="background-light850_dark100 relative h-dvh">
       <Navbar />
       <div className="flex">
         <LeftSidebar />
@@ -14,7 +14,6 @@ export default function Layout({ children }: { children: ReactNode }) {
         </section>
         <RightSidebar />
       </div>
-      Toaster
     </main>
   );
 }
