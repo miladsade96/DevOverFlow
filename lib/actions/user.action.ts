@@ -48,11 +48,14 @@ export async function deleteUser(params: DeleteUserParams) {
     await connectToDatabase();
     const { clerkId } = params;
     const user = User.findOneAndDelete({ clerkId });
-    if (!user) throw new Error("User not found!");
-    await Question.find({
-      author: user._id,
-    }).distinct("_id");
+    if (!user) {
+      throw new Error("User not found!");
+    }
+    // @ts-ignore
+    await Question.find({ author: user._id }).distinct("_id");
+    // @ts-ignore
     await Question.deleteMany({ author: user._id });
+    // @ts-ignore
     return await User.findByIdAndDelete(user._id);
   } catch (e) {
     console.log(e);
