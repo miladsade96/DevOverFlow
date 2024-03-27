@@ -5,6 +5,7 @@ import User from "@/database/user.model";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetAllUsersParams,
   UpdateUserParams,
 } from "@/lib/actions/shared.types";
 import { revalidatePath } from "next/cache";
@@ -57,6 +58,17 @@ export async function deleteUser(params: DeleteUserParams) {
     await Question.deleteMany({ author: user._id });
     // @ts-ignore
     return await User.findByIdAndDelete(user._id);
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+}
+
+export async function getAllUsers(params: GetAllUsersParams) {
+  try {
+    await connectToDatabase();
+    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    return User.find({}).sort({ createdAt: -1 });
   } catch (e) {
     console.log(e);
     throw e;
