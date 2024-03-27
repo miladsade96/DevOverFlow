@@ -28,7 +28,7 @@ export default async function Page() {
         {users.length > 0 ? (
           users.map((user) => <UserCard key={user._id} user={user} />)
         ) : (
-          <div className="paragrph-regular text-dark200_light800 mx-auto max-w-4xl text-center">
+          <div className="paragraph-regular text-dark200_light800 mx-auto max-w-4xl text-center">
             <p>No users yet!</p>
             <Link href="/sign-up" className="mt-2 font-bold text-accent-blue">
               Join to be first

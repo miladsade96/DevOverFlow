@@ -44,7 +44,7 @@ export default async function UserCard({ user }: UserCardProps) {
           {interactedTags.length > 0 ? (
             <div className="flex items-center gap-2">
               {interactedTags.map((tag) => (
-                <RenderTag _id={tag._id} name={tag.name} />
+                <RenderTag key={tag._id} _id={tag._id} name={tag.name} />
               ))}
             </div>
           ) : (
