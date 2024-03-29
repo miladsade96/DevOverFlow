@@ -5,7 +5,7 @@ import Metric from "@/components/shared/Metric";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import ParseHTML from "@/components/shared/ParseHTML";
 
-export default async function Page({ params }) {
+export default async function Page({ params }: any) {
   const result = await getQuestionById({ questionId: params.id });
   return (
     <>
