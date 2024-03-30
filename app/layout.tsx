@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import "../styles/globals.css";
+import "../styles/prism.css";
 import React from "react";
 import { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google"; // eslint-disable-line
