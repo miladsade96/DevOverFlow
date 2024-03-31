@@ -16,9 +16,22 @@ import React, { useRef, useState } from "react";
 import { useTheme } from "@/context/ThemeProvider";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { createAnswer } from "@/lib/actions/answer.action";
+import { usePathname } from "next/navigation";
 
-export default function Answer() {
-  const [isSubmitting] = useState(false);
+interface AnswerProps {
+  question: string;
+  questionId: string;
+  authorId: string;
+}
+
+export default function Answer({
+  question,
+  questionId,
+  authorId,
+}: AnswerProps) {
+  const pathname = usePathname();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const editorRef = useRef(null);
   const { mode } = useTheme();
   const form = useForm<z.infer<typeof AnswerSchema>>({
@@ -26,7 +39,27 @@ export default function Answer() {
     defaultValues: { answer: "" },
   });
 
-  function handleCreateAnswer() {}
+  async function handleCreateAnswer(values: z.infer<typeof AnswerSchema>) {
+    setIsSubmitting(true);
+    try {
+      await createAnswer({
+        content: values.answer,
+        author: JSON.parse(authorId),
+        question: JSON.parse(questionId),
+        path: pathname,
+      });
+      form.reset();
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent("");
+      }
+    } catch (e) {
+      console.log(e);
+      throw e;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="mt-12">
@@ -106,7 +139,7 @@ export default function Answer() {
           />
           <div className="flex justify-end">
             <Button
-              type="button"
+              type="submit"
               className="primary-gradient w-fit text-white"
               disabled={isSubmitting}
             >
