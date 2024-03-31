@@ -76,7 +76,11 @@ export default async function Page({ params }: any) {
           />
         ))}
       </div>
-      <Answer />
+      <Answer
+        question={result.content}
+        questionId={JSON.stringify(result._id)}
+        authorId={JSON.stringify(mongoUser._id)}
+      />
     </>
   );
 }
