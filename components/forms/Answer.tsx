@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 
 export default function Answer() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
   const editorRef = useRef(null);
   const { mode } = useTheme();
   const form = useForm<z.infer<typeof AnswerSchema>>({
