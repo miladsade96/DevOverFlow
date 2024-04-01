@@ -8,6 +8,7 @@ import RenderTag from "@/components/shared/RenderTag";
 import Answer from "@/components/forms/Answer";
 import { auth } from "@clerk/nextjs";
 import { getUserById } from "@/lib/actions/user.action";
+import AllAnswers from "@/components/shared/AllAnswers";
 
 export default async function Page({ params }: any) {
   const result = await getQuestionById({ questionId: params.id });
@@ -76,6 +77,11 @@ export default async function Page({ params }: any) {
           />
         ))}
       </div>
+      <AllAnswers
+        questionId={result._id}
+        userId={JSON.stringify(mongoUser._id)}
+        totalAnswers={result.answers.length}
+      />
       <Answer
         question={result.content}
         questionId={JSON.stringify(result._id)}
