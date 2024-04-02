@@ -9,6 +9,7 @@ import Answer from "@/components/forms/Answer";
 import { auth } from "@clerk/nextjs";
 import { getUserById } from "@/lib/actions/user.action";
 import AllAnswers from "@/components/shared/AllAnswers";
+import Votes from "../../../../components/shared/Votes";
 
 export default async function Page({ params }: any) {
   const result = await getQuestionById({ questionId: params.id });
@@ -36,7 +37,9 @@ export default async function Page({ params }: any) {
               {result.author.name}
             </p>
           </Link>
-          <div className="flex justify-end">VOTING</div>
+          <div className="flex justify-end">
+            <Votes />
+          </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
           {result.title}
