@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { formatAndDivideNumber } from "@/lib/utils";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   downvoteQuestion,
   upvoteQuestion,
 } from "@/lib/actions/question.action";
+import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
 
 interface VotesProps {
   type: string;
@@ -30,7 +31,8 @@ export default function Votes({
   hasSaved,
 }: VotesProps) {
   const pathname = usePathname();
-  const router = useRouter();
+
+  // const router = useRouter();
   function handleSave() {}
 
   async function handleVote(action: string) {
@@ -47,13 +49,13 @@ export default function Votes({
           path: pathname,
         });
       } else if (type === "Answer") {
-        // await upvoteAnswer({
-        //   questionId: JSON.parse(itemId),
-        //   userId: JSON.parse(userId),
-        //   hasupVoted,
-        //   hasdownVoted,
-        //   path: pathname,
-        // });
+        await upvoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasupVoted,
+          hasdownVoted,
+          path: pathname,
+        });
       }
     }
     if (action === "downvote") {
@@ -66,13 +68,13 @@ export default function Votes({
           path: pathname,
         });
       } else if (type === "Answer") {
-        // await downvoteAnswer({
-        //   questionId: JSON.parse(itemId),
-        //   userId: JSON.parse(userId),
-        //   hasupVoted,
-        //   hasdownVoted,
-        //   path: pathname,
-        // });
+        await downvoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasupVoted,
+          hasdownVoted,
+          path: pathname,
+        });
       }
     }
   }
