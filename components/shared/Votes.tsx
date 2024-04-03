@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 import { formatAndDivideNumber } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  downvoteQuestion,
+  upvoteQuestion,
+} from "@/lib/actions/question.action";
 
 interface VotesProps {
   type: string;
