@@ -121,18 +121,20 @@ export default function Votes({
           </div>
         </div>
       </div>
-      <Image
-        src={
-          hasSaved
-            ? "/assets/icons/star-filled.svg"
-            : "/assets/icons/star-red.svg"
-        }
-        alt="star"
-        height={18}
-        width={18}
-        className="cursor-pointer"
-        onClick={handleSave}
-      />
+      {type === "Question" && (
+        <Image
+          src={
+            hasSaved
+              ? "/assets/icons/star-filled.svg"
+              : "/assets/icons/star-red.svg"
+          }
+          alt="star"
+          height={18}
+          width={18}
+          className="cursor-pointer"
+          onClick={handleSave}
+        />
+      )}
     </div>
   );
 }
