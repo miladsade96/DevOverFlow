@@ -8,6 +8,7 @@ import {
   upvoteQuestion,
 } from "@/lib/actions/question.action";
 import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
+import { toggleSaveQuestion } from "@/lib/actions/user.action";
 
 interface VotesProps {
   type: string;
@@ -33,7 +34,13 @@ export default function Votes({
   const pathname = usePathname();
 
   // const router = useRouter();
-  function handleSave() {}
+  async function handleSave() {
+    await toggleSaveQuestion({
+      questionId: JSON.parse(itemId),
+      userId: JSON.parse(userId),
+      path: pathname,
+    });
+  }
 
   async function handleVote(action: string) {
     if (!userId) {
