@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { formatAndDivideNumber } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   downvoteQuestion,
   upvoteQuestion,
 } from "@/lib/actions/question.action";
 import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import { useEffect } from "react";
+import { viewQuestion } from "@/lib/actions/interaction.action";
 
 interface VotesProps {
   type: string;
@@ -32,8 +34,8 @@ export default function Votes({
   hasSaved,
 }: VotesProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  // const router = useRouter();
   async function handleSave() {
     await toggleSaveQuestion({
       questionId: JSON.parse(itemId),
@@ -85,6 +87,13 @@ export default function Votes({
       }
     }
   }
+
+  useEffect(() => {
+    viewQuestion({
+      questionId: JSON.parse(itemId),
+      userId: userId ? JSON.parse(userId) : undefined,
+    });
+  }, [itemId, userId, pathname, router]);
 
   return (
     <div className="flex gap-5">
