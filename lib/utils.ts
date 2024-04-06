@@ -51,3 +51,9 @@ export function formatAndDivideNumber(num: number): string {
     return num.toString();
   }
 }
+
+export function getJoinedDate(date: Date): string {
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  return `${month} ${year}`;
+}
