@@ -4,10 +4,11 @@ import { sidebarLinks } from "@/constants";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedOut, useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 export default function LeftSidebar() {
+  const { userId } = useAuth();
   const pathName = usePathname();
   return (
     <section
@@ -20,6 +21,15 @@ export default function LeftSidebar() {
           const isActive =
             (pathName.includes(item.route) && item.route.length > 1) ||
             pathName === item.route;
+
+          if (item.route === "/profile") {
+            if (userId) {
+              item.route = `/profile/${userId}`;
+            } else {
+              return null;
+            }
+          }
+
           return (
             <Link
               key={item.route}
