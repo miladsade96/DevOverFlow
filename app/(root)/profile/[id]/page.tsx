@@ -89,8 +89,13 @@ export default async function Page({ params, searchParams }: URLProps) {
               clerkId={clerkId}
             />
           </TabsContent>
-          <TabsContent value="answers">
-            <AnswersTab />
+          <TabsContent value="answers" className="flex w-full flex-col gap-6">
+            <AnswersTab
+              searchParams={searchParams}
+              userId={user._id}
+              // @ts-ignore
+              clerkId={clerkId}
+            />
           </TabsContent>
         </Tabs>
       </div>
