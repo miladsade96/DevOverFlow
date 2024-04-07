@@ -12,10 +12,12 @@ interface QuestionCardProps {
   views: number;
   answers: Array<object>;
   createdAt: Date;
+  clerkId?: string;
 }
 
 export default function QuestionCard({
   _id,
+  clerkId,
   title,
   tags,
   author,
