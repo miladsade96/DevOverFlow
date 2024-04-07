@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getJoinedDate } from "@/lib/utils";
 import ProfileLink from "@/components/shared/ProfileLink";
 import Stats from "@/components/shared/Stats";
+import QuestionsTab from "@/components/shared/QuestionsTab";
+import AnswersTab from "@/components/shared/AnswersTab";
 
 export default async function Page({ params, searchParams }: URLProps) {
   const { userId: clerkId } = auth();
@@ -73,14 +75,23 @@ export default async function Page({ params, searchParams }: URLProps) {
         <Tabs defaultValue="top-posts" className="flex-1">
           <TabsList className="background-light800_dark400 min-h-[42px] p-1">
             <TabsTrigger value="top-posts" className="tab">
-              Top Posts
+              Top Questions
             </TabsTrigger>
             <TabsTrigger value="answers" className="tab">
               Answers
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="top-posts">POSTS</TabsContent>
-          <TabsContent value="answers">ANSWERS</TabsContent>
+          <TabsContent value="top-posts">
+            <QuestionsTab
+              searchParams={searchParams}
+              userId={user._id}
+              // @ts-ignore
+              clerkId={clerkId}
+            />
+          </TabsContent>
+          <TabsContent value="answers">
+            <AnswersTab />
+          </TabsContent>
         </Tabs>
       </div>
     </>
