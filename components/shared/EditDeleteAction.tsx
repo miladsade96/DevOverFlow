@@ -1,33 +1,38 @@
 "use client";
 
+import { deleteAnswer } from "@/lib/actions/answer.action";
+import { deleteQuestion } from "@/lib/actions/question.action";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { deleteQuestion } from "@/lib/actions/question.action";
-import { deleteAnswer } from "@/lib/actions/answer.action";
 
-interface EditDeleteActionProps {
+interface Props {
   type: string;
   itemId: string;
 }
 
-export default function EditDeleteAction({
-  type,
-  itemId,
-}: EditDeleteActionProps) {
+const EditDeleteAction = ({ type, itemId }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  function handleEdit() {
+  const handleEdit = () => {
     router.push(`/question/edit/${JSON.parse(itemId)}`);
-  }
+  };
 
-  async function handleDelete() {
+  const handleDelete = async () => {
     if (type === "Question") {
-      await deleteQuestion({ questionId: JSON.parse(itemId), path: pathname });
+      // Delete question
+      await deleteQuestion({
+        questionId: JSON.parse(itemId),
+        path: pathname,
+      });
     } else if (type === "Answer") {
-      await deleteAnswer({ answerId: JSON.parse(itemId), path: pathname });
+      // Delete answer
+      await deleteAnswer({
+        answerId: JSON.parse(itemId),
+        path: pathname,
+      });
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-end gap-3 max-sm:w-full">
@@ -41,6 +46,7 @@ export default function EditDeleteAction({
           onClick={handleEdit}
         />
       )}
+
       <Image
         src="/assets/icons/trash.svg"
         alt="Delete"
@@ -51,4 +57,6 @@ export default function EditDeleteAction({
       />
     </div>
   );
-}
+};
+
+export default EditDeleteAction;
