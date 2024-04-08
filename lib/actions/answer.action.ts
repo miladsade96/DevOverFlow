@@ -105,7 +105,7 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
     if (!answer) {
       throw new Error("Answer not found!");
     }
-    await Answer.deleteOne({ _id: answerId });
+    await answer.deleteOne({ _id: answerId });
     await Question.updateMany(
       { _id: answer.question },
       { $pull: { answers: answerId } },
