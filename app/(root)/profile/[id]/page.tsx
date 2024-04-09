@@ -52,7 +52,7 @@ export default async function Page({ params, searchParams }: URLProps) {
               />
             </div>
             {user.bio && (
-              <p className="paragraph-regular text-dark400_light800">
+              <p className="paragraph-regular text-dark400_light800 mt-2">
                 {user.bio}
               </p>
             )}
