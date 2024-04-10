@@ -165,3 +165,18 @@ export async function editQuestion(params: EditQuestionParams) {
     console.log(error);
   }
 }
+
+export async function getTopQuestions() {
+  try {
+    await connectToDatabase();
+    return await Question.find({})
+      .sort({
+        views: -1,
+        upvote: -1,
+      })
+      .limit(5);
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+}
