@@ -1,21 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import RenderTag from "@/components/shared/RenderTag";
-
-export default function RightSidebar() {
-  const topQuestions = [
-    { _id: "1", title: "How to learn nextjs?" },
-    { _id: "2", title: "How to learn react" },
-    { _id: "3", title: "What are hooks in react?" },
-    {
-      _id: "4",
-      title: "Explain the use case of useImperativeHandle hook in react?",
-    },
-    {
-      _id: "5",
-      title: "What are the differences between SSG, CSR and SSR in nextjs?",
-    },
-  ];
+import { getTopQuestions } from "@/lib/actions/question.action";
 
   const popularTags = [
     { _id: "1", name: "javascript", totalQuestions: 6 },
@@ -24,6 +10,9 @@ export default function RightSidebar() {
     { _id: "4", name: "next", totalQuestions: 20 },
     { _id: "5", name: "vue", totalQuestions: 10 },
   ];
+
+export default async function RightSidebar() {
+  const topQuestions = await getTopQuestions();
 
   return (
     <section
@@ -37,7 +26,7 @@ export default function RightSidebar() {
           {topQuestions.map((question) => {
             return (
               <Link
-                href={`/questions/${question._id}`}
+                href={`/question/${question._id}`}
                 key={question._id}
                 className="flex cursor-pointer items-center justify-between gap-7"
               >
