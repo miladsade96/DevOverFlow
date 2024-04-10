@@ -2,17 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import RenderTag from "@/components/shared/RenderTag";
 import { getTopQuestions } from "@/lib/actions/question.action";
-
-  const popularTags = [
-    { _id: "1", name: "javascript", totalQuestions: 6 },
-    { _id: "2", name: "typescript", totalQuestions: 9 },
-    { _id: "3", name: "react", totalQuestions: 12 },
-    { _id: "4", name: "next", totalQuestions: 20 },
-    { _id: "5", name: "vue", totalQuestions: 10 },
-  ];
+import { getPopularTags } from "@/lib/actions/tag.actions";
 
 export default async function RightSidebar() {
   const topQuestions = await getTopQuestions();
+  const popularTags = await getPopularTags();
 
   return (
     <section
@@ -53,7 +47,7 @@ export default async function RightSidebar() {
               key={tag._id}
               _id={tag._id}
               name={tag.name}
-              totalQuestions={tag.totalQuestions}
+              totalQuestions={tag.numberOfQuestions}
               showCount={true}
             />
           ))}
