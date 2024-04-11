@@ -32,7 +32,12 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 export async function getAllTags(params: GetAllTagsParams) {
   try {
     await connectToDatabase();
-    return await Tag.find({});
+    const { searchQuery } = params;
+    const query: FilterQuery<typeof Tag> = {};
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, "i") } }];
+    }
+    return await Tag.find(query);
   } catch (e) {
     console.log(e);
     throw e;
