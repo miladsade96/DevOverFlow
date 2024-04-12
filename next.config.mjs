@@ -3,17 +3,6 @@ const nextConfig = {
   experimental: {
     mdxRs: true,
     serverComponentsExternalPackages: ["mongoose"],
-    turbo: {
-      resolveExtensions: [
-        ".mdx",
-        ".tsx",
-        ".ts",
-        ".jsx",
-        ".js",
-        ".mjs",
-        ".json",
-      ],
-    },
   },
   images: {
     remotePatterns: [
