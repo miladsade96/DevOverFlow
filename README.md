@@ -1,3 +1,3 @@
 # DevOverFlow
-## StavkOverFlow Clone powered by NextJS
+## A StackOverFlow Clone powered by NextJS
 #### This application is under active development
