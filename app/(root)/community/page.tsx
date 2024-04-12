@@ -7,7 +7,10 @@ import UserCard from "@/components/cards/UserCard";
 import { SearchParamsProps } from "@/types";
 
 export default async function Page({ searchParams }: SearchParamsProps) {
-  const users = await getAllUsers({ searchQuery: searchParams.q });
+  const users = await getAllUsers({
+    searchQuery: searchParams.q,
+    filter: searchParams.filter,
+  });
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Users</h1>
