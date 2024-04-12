@@ -17,7 +17,11 @@ interface FilterProps {
   containerClasses?: string;
 }
 
-export default function Filter({ filters, otherClasses, containerClasses }: FilterProps) {
+export default function Filter({
+  filters,
+  otherClasses,
+  containerClasses,
+}: FilterProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const paramFilter = searchParams.get("filter");
