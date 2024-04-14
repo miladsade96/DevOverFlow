@@ -75,10 +75,10 @@ export default async function Page({ params, searchParams }: URLProps) {
         <Tabs defaultValue="top-posts" className="flex-1">
           <TabsList className="background-light800_dark400 min-h-[42px] p-1">
             <TabsTrigger value="top-posts" className="tab">
-              Top Questions
+              Your Questions
             </TabsTrigger>
             <TabsTrigger value="answers" className="tab">
-              Answers
+              Your Answers
             </TabsTrigger>
           </TabsList>
           <TabsContent value="top-posts">
