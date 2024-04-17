@@ -6,20 +6,28 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import GlobalFilters from "./GlobalFilters";
+import { globalSearch } from "@/lib/actions/general.action";
 
 export default function GlobalResult() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState([
-    { type: "question", id: 1, title: "NextJS question" },
-    { type: "tag", id: 1, title: "NextJS" },
-    { type: "user", id: 1, title: "Milad Sadeghi" },
-  ]);
+  const [result, setResult] = useState([]);
   const global = searchParams.get("global");
   const type = searchParams.get("type");
 
   function renderLink(id: string, type: string) {
-    return "/";
+    switch (type) {
+      case "question":
+        return `/question/${id}`;
+      case "answer":
+        return `/question/${id}`;
+      case "user":
+        return `/profile/${id}`;
+      case "tag":
+        return `/tags/${id}`;
+      default:
+        return "/";
+    }
   }
 
   useEffect(() => {
@@ -27,13 +35,18 @@ export default function GlobalResult() {
       setIsLoading(true);
       setResult([]);
       try {
-        // Not yet implemented
+        const res = await globalSearch({ query: global, type });
+        setResult(JSON.parse(res));
       } catch (err) {
         console.log(err);
         throw err;
       } finally {
         setIsLoading(false);
       }
+    }
+
+    if (global) {
+      fetchResult();
     }
   }, [global, type]);
 
@@ -57,7 +70,7 @@ export default function GlobalResult() {
             {result.length > 0 ? (
               result.map((item: any, index: number) => (
                 <Link
-                  href={renderLink("id", "type")}
+                  href={renderLink(item.id, item.type)}
                   key={item.id + item.type + index}
                   className="flex w-full cursor-pointer items-start gap-3 px-5 py-2.5 hover:bg-light-700/50
                   dark:bg-dark-500/50"
