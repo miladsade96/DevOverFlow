@@ -1,5 +1,6 @@
 import { formatAndDivideNumber } from "@/lib/utils";
 import Image from "next/image";
+import { BadgeCounts } from "@/types";
 
 interface StatsCardProps {
   title: string;
@@ -27,9 +28,14 @@ function StatsCard({ title, imgUrl, value }: StatsCardProps) {
 interface StatsProps {
   totalQuestions: number;
   totalAnswers: number;
+  badgeCounts: BadgeCounts;
 }
 
-export default function Stats({ totalQuestions, totalAnswers }: StatsProps) {
+export default function Stats({
+  totalQuestions,
+  totalAnswers,
+  badgeCounts,
+}: StatsProps) {
   return (
     <div className="mt-10">
       <h4 className="h3-semibold text-dark200_light900">Stats</h4>
@@ -54,17 +60,17 @@ export default function Stats({ totalQuestions, totalAnswers }: StatsProps) {
         <StatsCard
           imgUrl="/assets/icons/gold-medal.svg"
           title="Gold Badges"
-          value={0}
+          value={badgeCounts.GOLD}
         />
         <StatsCard
           imgUrl="/assets/icons/silver-medal.svg"
           title="Silver Badges"
-          value={0}
+          value={badgeCounts.SILVER}
         />
         <StatsCard
           imgUrl="/assets/icons/bronze-medal.svg"
           title="Bronze Badges"
-          value={0}
+          value={badgeCounts.BRONZE}
         />
       </div>
     </div>
