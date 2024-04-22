@@ -10,6 +10,9 @@ const nextConfig = {
       { protocol: "http", hostname: "*" },
     ],
   },
+  env: {
+    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+  },
 };
 
 export default nextConfig;
