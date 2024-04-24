@@ -19,6 +19,7 @@ import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { usePathname } from "next/navigation";
 import { generateGeminiAnswer } from "@/lib/api/google";
+import { toast } from "@/components/ui/use-toast";
 
 interface AnswerProps {
   question: string;
@@ -75,6 +76,8 @@ export default function Answer({
         const editor = editorRef.current as any;
         editor.setContent(answer);
       }
+
+      return toast({ title: "The answer has been generated successfully" });
     } catch (e) {
       console.log(e);
     } finally {
