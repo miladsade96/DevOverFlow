@@ -57,6 +57,8 @@ export default function Answer({
         const editor = editorRef.current as any;
         editor.setContent("");
       }
+
+      return toast({ title: "Your answer is successfully submitted" });
     } catch (e) {
       console.log(e);
       throw e;
