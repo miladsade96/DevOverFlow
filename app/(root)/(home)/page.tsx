@@ -9,6 +9,12 @@ import QuestionCard from "@/components/cards/QuestionCard";
 import { getQuestions } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/shared/Pagination";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home | DevOverFlow",
+  description: "A community for developers, Join us now!",
+};
 
 export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({

@@ -6,6 +6,12 @@ import { getAllTags } from "@/lib/actions/tag.actions";
 import Link from "next/link";
 import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/shared/Pagination";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Tags | DevOverFlow",
+  description: "All tags submitted on DevOverFlow.",
+};
 
 export default async function Page({ searchParams }: SearchParamsProps) {
   const { tags, isNext } = await getAllTags({

@@ -10,6 +10,22 @@ import ProfileLink from "@/components/shared/ProfileLink";
 import Stats from "@/components/shared/Stats";
 import QuestionsTab from "@/components/shared/QuestionsTab";
 import AnswersTab from "@/components/shared/AnswersTab";
+import { Metadata, ResolvingMetadata } from "next";
+
+interface Props {
+  params: { id: string };
+}
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const { user } = await getUserInfo({ userId: params.id });
+  return {
+    title: `${user.name}'s Profile`,
+    description: `The profile page of ${user.name}`,
+  };
+}
 
 export default async function Page({ params, searchParams }: URLProps) {
   const { userId: clerkId } = auth();
