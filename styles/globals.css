@@ -8,6 +8,12 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+@layer base {
+  body {
+    @apply dark:bg-black;
+  }
+}
+
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;

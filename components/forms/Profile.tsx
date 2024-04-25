@@ -76,12 +76,12 @@ export default function Profile({ clerkId, user }: ProfileProps) {
           name="name"
           render={({ field }) => (
             <FormItem className="space-y-3.5">
-              <FormLabel>
+              <FormLabel className="paragraph-semibold text-dark400_light800">
                 Name <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
-                  className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700
+                  className="no-focus paragraph-regular light-border-2 background-light800_dark300 text-dark300_light700
                   min-h-[56px]"
                   placeholder="Your name"
                   {...field}
@@ -96,12 +96,12 @@ export default function Profile({ clerkId, user }: ProfileProps) {
           name="username"
           render={({ field }) => (
             <FormItem className="space-y-3.5">
-              <FormLabel>
+              <FormLabel className="paragraph-semibold text-dark400_light800">
                 Username <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
-                  className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700
+                  className="no-focus paragraph-regular light-border-2 background-light800_dark300 text-dark300_light700
                   min-h-[56px]"
                   placeholder="Your username"
                   {...field}
@@ -116,11 +116,13 @@ export default function Profile({ clerkId, user }: ProfileProps) {
           name="portfolioWebsite"
           render={({ field }) => (
             <FormItem className="space-y-3.5">
-              <FormLabel>Portfolio Link</FormLabel>
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Portfolio Link
+              </FormLabel>
               <FormControl>
                 <Input
                   type="url"
-                  className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700
+                  className="no-focus paragraph-regular light-border-2 background-light800_dark300 text-dark300_light700
                   min-h-[56px]"
                   placeholder="Your portfolio URL"
                   {...field}
@@ -135,10 +137,12 @@ export default function Profile({ clerkId, user }: ProfileProps) {
           name="location"
           render={({ field }) => (
             <FormItem className="space-y-3.5">
-              <FormLabel>Location</FormLabel>
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Location
+              </FormLabel>
               <FormControl>
                 <Input
-                  className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700
+                  className="no-focus paragraph-regular light-border-2 background-light800_dark300 text-dark300_light700
                   min-h-[56px]"
                   placeholder="Where are you from?"
                   {...field}
@@ -153,10 +157,12 @@ export default function Profile({ clerkId, user }: ProfileProps) {
           name="bio"
           render={({ field }) => (
             <FormItem className="space-y-3.5">
-              <FormLabel>Bio</FormLabel>
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Bio
+              </FormLabel>
               <FormControl>
                 <Textarea
-                  className="no-focus paragraph-regular light-border-2 background-light700_dark300 text-dark300_light700
+                  className="no-focus paragraph-regular light-border-2 background-light800_dark300 text-dark300_light700
                   min-h-[56px]"
                   placeholder="What's special about you?"
                   {...field}
