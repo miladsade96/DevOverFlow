@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 import { ProfileSchema } from "@/lib/validations";
 import { usePathname, useRouter } from "next/navigation";
 import { updateUser } from "@/lib/actions/user.action";
@@ -59,7 +60,11 @@ export default function Profile({ clerkId, user }: ProfileProps) {
       });
       router.back();
     } catch (e) {
-      console.log(e);
+      toast({
+        title:
+          e instanceof Error ? e.message : "Could not update your profile.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

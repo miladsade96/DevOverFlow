@@ -10,10 +10,17 @@ import { globalSearch } from "@/lib/actions/general.action";
 
 export default function GlobalResult() {
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState([]);
+  const [data, setData] = useState<{
+    key: string;
+    items: { id: string; type: string; title: string }[];
+    error?: string;
+  }>({ key: "", items: [] });
   const global = searchParams.get("global");
   const type = searchParams.get("type");
+
+  const key = JSON.stringify([global, type]);
+  const isLoading = !!global && data.key !== key;
+  const result = data.key === key ? data.items : [];
 
   function renderLink(id: string, type: string) {
     switch (type) {
@@ -31,28 +38,33 @@ export default function GlobalResult() {
   }
 
   useEffect(() => {
-    async function fetchResult() {
-      setIsLoading(true);
-      setResult([]);
-      try {
-        const res = await globalSearch({ query: global, type });
-        setResult(JSON.parse(res));
-      } catch (err) {
-        console.log(err);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (global) {
-      fetchResult();
-    }
-  }, [global, type]);
+    let active = true;
+    if (global?.trim())
+      void globalSearch({ query: global, type })
+        .then((response) => {
+          if (active) setData({ key, items: JSON.parse(response) });
+        })
+        .catch(() => {
+          if (active)
+            setData({
+              key,
+              items: [],
+              error: "Search is temporarily unavailable. Please try again.",
+            });
+        });
+    return () => {
+      active = false;
+    };
+  }, [global, type, key]);
 
   return (
     <div className="absolute top-full z-10 mt-3 w-full rounded-xl bg-light-800 py-5 shadow-sm dark:bg-dark-400">
       <GlobalFilters />
+      {data.key === key && data.error && (
+        <p role="alert" className="px-5 text-red-500">
+          {data.error}
+        </p>
+      )}
       <div className="my-5 h-px bg-light-700/50 dark:bg-dark-500/50" />
       <div className="space-y-5">
         <p className="text-dark400_light900 paragraph-semibold px-5">

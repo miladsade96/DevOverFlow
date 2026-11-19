@@ -3,17 +3,15 @@
 import { HomePageFilters } from "@/constants/filters";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import { formUrlQuery } from "@/lib/utils";
 
 export default function HomeFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [active, setActive] = useState("");
+  const active = searchParams.get("filter") || "";
 
   function handleTypeClick(item: string) {
     if (active === item) {
-      setActive("");
       const newUrl = formUrlQuery({
         params: searchParams.toString(),
         key: "filter",
@@ -21,7 +19,6 @@ export default function HomeFilters() {
       });
       router.push(newUrl, { scroll: false });
     } else {
-      setActive(item);
       const newUrl = formUrlQuery({
         params: searchParams.toString(),
         key: "filter",
@@ -37,6 +34,7 @@ export default function HomeFilters() {
         return (
           <Button
             key={item.value}
+            aria-pressed={active === item.value}
             onClick={() => handleTypeClick(item.value)}
             className={`body-medium rounded-lg px-6 py-3 capitalize shadow-none 
             ${

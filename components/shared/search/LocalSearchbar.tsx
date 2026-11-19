@@ -26,9 +26,11 @@ export default function LocalSearchbar({
   const searchParams = useSearchParams();
 
   const query = searchParams.get("q");
-  const [search, setSearch] = useState(query || "");
+  const [draft, setDraft] = useState({ query, value: query || "" });
+  const search = draft.query === query ? draft.value : query || "";
 
   useEffect(() => {
+    if (search === (query || "") || pathname !== route) return;
     const delayDebounce = setTimeout(() => {
       if (search) {
         const newUrl = formUrlQuery({
@@ -40,7 +42,7 @@ export default function LocalSearchbar({
       } else if (pathname === route) {
         const newUrl = removeKeysFromQuery({
           params: searchParams.toString(),
-          keysToRemove: ["q"],
+          keysToRemove: ["q", "page"],
         });
         router.push(newUrl, { scroll: false });
       }
@@ -67,7 +69,8 @@ export default function LocalSearchbar({
         type="text"
         placeholder={placeHolder}
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        aria-label={placeHolder}
+        onChange={(e) => setDraft({ query, value: e.target.value })}
         className="paragraph-regular no-focus placeholder text-dark400_light700 border-none bg-transparent shadow-none outline-none"
       />
       {iconPosition === "right" && (

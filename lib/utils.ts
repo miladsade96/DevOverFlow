@@ -70,6 +70,7 @@ interface UrlQueryParams {
 export function formUrlQuery({ key, params, value }: UrlQueryParams) {
   const currentUrl = qs.parse(params);
   currentUrl[key] = value;
+  if (key === "q" || key === "filter") delete currentUrl.page;
   return qs.stringifyUrl(
     {
       url: window.location.pathname,

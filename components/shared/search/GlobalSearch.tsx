@@ -14,7 +14,9 @@ export default function GlobalSearch() {
   const searchContainerRef = useRef(null);
 
   const query = searchParams.get("global");
-  const [search, setSearch] = useState(query || "");
+  const [draft, setDraft] = useState({ query, value: query || "" });
+  const search = draft.query === query ? draft.value : query || "";
+  const [openPath, setOpenPath] = useState(pathname);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -25,11 +27,9 @@ export default function GlobalSearch() {
         !searchContainerRef.current.contains(event.target)
       ) {
         setIsOpen(false);
-        setSearch("");
       }
     }
 
-    setIsOpen(false);
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
@@ -38,6 +38,7 @@ export default function GlobalSearch() {
   }, [pathname]);
 
   useEffect(() => {
+    if (search === (query || "")) return;
     const delayDebounce = setTimeout(() => {
       if (search) {
         const newUrl = formUrlQuery({
@@ -74,9 +75,11 @@ export default function GlobalSearch() {
         />
         <Input
           type="text"
+          aria-label="Search globally"
           value={search}
           onChange={(e) => {
-            setSearch(e.target.value);
+            setOpenPath(pathname);
+            setDraft({ query, value: e.target.value });
             if (!isOpen) setIsOpen(true);
             if (e.target.value === "" && isOpen) setIsOpen(false);
           }}
@@ -85,7 +88,7 @@ export default function GlobalSearch() {
            border-none bg-transparent shadow-none outline-none"
         />
       </div>
-      {isOpen && <GlobalResult />}
+      {isOpen && openPath === pathname && <GlobalResult />}
     </div>
   );
 }

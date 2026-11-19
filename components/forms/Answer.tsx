@@ -11,9 +11,8 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { AnswerSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Editor } from "@tinymce/tinymce-react";
-import React, { useRef, useState } from "react";
-import { useTheme } from "@/context/ThemeProvider";
+import RichTextEditor from "./RichTextEditor";
+import React, { useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
@@ -36,8 +35,6 @@ export default function Answer({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittingAI, setIsSubmittingAI] = useState(false);
 
-  const editorRef = useRef(null);
-  const { mode } = useTheme();
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
     defaultValues: { answer: "" },
@@ -53,15 +50,13 @@ export default function Answer({
         path: pathname,
       });
       form.reset();
-      if (editorRef.current) {
-        const editor = editorRef.current as any;
-        editor.setContent("");
-      }
 
       return toast({ title: "Your answer is successfully submitted" });
     } catch (e) {
-      console.log(e);
-      throw e;
+      toast({
+        title: e instanceof Error ? e.message : "Could not submit your answer.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -71,17 +66,18 @@ export default function Answer({
     if (!authorId) return;
     setIsSubmittingAI(true);
     try {
-      const prompt = `Answer this question: ${JSON.stringify(question)} and convert the answer to html format.`;
-      const answer = await generateGeminiAnswer(prompt);
-      // const formattedAnswer = answer?.replace(/\n/g, "<br />");
-      if (editorRef.current) {
-        const editor = editorRef.current as any;
-        editor.setContent(answer);
-      }
+      const answer = await generateGeminiAnswer(question);
+      form.setValue("answer", answer, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
 
       return toast({ title: "The answer has been generated successfully" });
     } catch (e) {
-      console.log(e);
+      toast({
+        title: e instanceof Error ? e.message : "Could not generate an answer.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmittingAI(false);
     }
@@ -94,7 +90,7 @@ export default function Answer({
           Write your answer here
         </h4>
         <Button
-          disabled={isSubmittingAI}
+          disabled={isSubmittingAI || isSubmitting || !authorId}
           onClick={() => generateAIAnswer()}
           className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500"
         >
@@ -125,45 +121,11 @@ export default function Answer({
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-3">
                 <FormControl className="mt-3.5">
-                  <Editor
+                  <RichTextEditor
+                    label="Your answer"
+                    value={field.value}
+                    onChange={field.onChange}
                     onBlur={field.onBlur}
-                    onEditorChange={(content) => field.onChange(content)}
-                    apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
-                    onInit={(evt, editor) => {
-                      // @ts-ignore
-                      editorRef.current = editor;
-                    }}
-                    init={{
-                      height: 350,
-                      menubar: false,
-                      plugins: [
-                        "advlist",
-                        "autolink",
-                        "lists",
-                        "link",
-                        "image",
-                        "charmap",
-                        "preview",
-                        "anchor",
-                        "searchreplace",
-                        "visualblocks",
-                        "codesample",
-                        "fullscreen",
-                        "insertdatetime",
-                        "media",
-                        "table",
-                        "code",
-                        "wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | blocks | codesample |" +
-                        "bold italic forecolor | alignleft aligncenter " +
-                        "alignright alignjustify | bullist numlist outdent indent",
-                      content_style:
-                        "body { font-family:Inter; font-size:16px }",
-                      skin: mode === "dark" ? "oxide-dark" : "oxide",
-                      content_css: mode === "dark" ? "dark" : "light",
-                    }}
                   />
                 </FormControl>
                 <FormMessage className="text-red-500" />
@@ -174,7 +136,7 @@ export default function Answer({
             <Button
               type="submit"
               className="primary-gradient w-fit text-white"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSubmittingAI || !authorId}
             >
               {isSubmitting ? "Submitting" : "Submit"}
             </Button>
