@@ -12,30 +12,51 @@ import Question from "@/database/question.model";
 import { revalidatePath } from "next/cache";
 import Interaction from "@/database/interaction.model";
 import User from "@/database/user.model";
+import { Types } from "mongoose";
+import { requireActor, assertOwner } from "@/lib/server/auth";
+import { inTransaction } from "@/lib/server/transaction";
+import { castVote } from "@/lib/server/voting";
+import { objectId, pagination } from "@/lib/query";
+import { cleanHtml } from "@/lib/html";
+import { AnswerSchema } from "@/lib/validations";
 
 export async function createAnswer(params: CreateAnswerParams) {
-  try {
-    await connectToDatabase();
-    const { content, author, question, path } = params;
-    const newAnswer = await Answer.create({ content, author, question });
-    const questionObject = await Question.findByIdAndUpdate(question, {
-      $push: { answers: newAnswer._id },
-    });
-
-    await Interaction.create({
-      user: author,
-      action: "answer",
-      question,
-      answer: newAnswer._id,
-      tags: questionObject.tags,
-    });
-    await User.findByIdAndUpdate(author, { $inc: { reputation: 10 } });
-
-    revalidatePath(path);
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+  const actor = await requireActor();
+  const questionId = objectId(params.question);
+  const { answer: content } = AnswerSchema.parse({
+    answer: cleanHtml(params.content),
+  });
+  await inTransaction(async (session) => {
+    const question = await Question.findById(questionId).session(session);
+    if (!question) throw new Error("Question not found.");
+    const [answer] = await Answer.create(
+      [{ content, author: actor._id, question: questionId }],
+      { session },
+    );
+    await Question.updateOne(
+      { _id: questionId },
+      { $addToSet: { answers: answer._id } },
+      { session },
+    );
+    await Interaction.create(
+      [
+        {
+          user: actor._id,
+          action: "answer",
+          question: questionId,
+          answer: answer._id,
+          tags: question.tags,
+        },
+      ],
+      { session },
+    );
+    await User.updateOne(
+      { _id: actor._id },
+      { $inc: { reputation: 10 } },
+      { session },
+    );
+  });
+  revalidatePath(`/question/${questionId}`);
 }
 
 export async function getAnswers(params: GetAnswersParams) {
@@ -43,15 +64,16 @@ export async function getAnswers(params: GetAnswersParams) {
     await connectToDatabase();
     const { questionId, sortBy, page = 1, pageSize = 10 } = params;
 
-    const skipAmount = (page - 1) * pageSize;
+    objectId(questionId);
+    const { skipAmount, limit } = pagination(page, pageSize);
 
-    let sortOptions = {};
+    let sortOptions: Record<string, 1 | -1> = { createdAt: -1, _id: -1 };
     switch (sortBy) {
       case "highestUpvotes":
-        sortOptions = { upvotes: -1 };
+        sortOptions = { voteCount: -1, createdAt: -1, _id: -1 };
         break;
       case "lowestUpvotes":
-        sortOptions = { upvotes: 1 };
+        sortOptions = { voteCount: 1, createdAt: -1, _id: -1 };
         break;
       case "recent":
         sortOptions = { createdAt: -1 };
@@ -63,11 +85,18 @@ export async function getAnswers(params: GetAnswersParams) {
         break;
     }
 
-    const answers = await Answer.find({ question: questionId })
-      .populate("author", "_id clerkId name picture")
-      .sort(sortOptions)
-      .skip(skipAmount)
-      .limit(pageSize);
+    const answers = await Answer.aggregate([
+      { $match: { question: new Types.ObjectId(questionId) } },
+      { $addFields: { voteCount: { $size: { $ifNull: ["$upvotes", []] } } } },
+      { $sort: sortOptions },
+      { $skip: skipAmount },
+      { $limit: limit },
+      { $project: { voteCount: 0 } },
+    ]);
+    await Answer.populate(answers, {
+      path: "author",
+      select: "_id clerkId name picture",
+    });
 
     const totalAnswers = await Answer.countDocuments({ question: questionId });
     const isNextAnswers = totalAnswers > skipAmount + answers.length;
@@ -80,94 +109,29 @@ export async function getAnswers(params: GetAnswersParams) {
 }
 
 export async function upvoteAnswer(params: AnswerVoteParams) {
-  try {
-    await connectToDatabase();
-    const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
-    let updateQuery;
-    if (hasupVoted) {
-      updateQuery = { $pull: { upvotes: userId } };
-    } else if (hasdownVoted) {
-      updateQuery = {
-        $pull: { downvotes: userId },
-        $push: { upvotes: userId },
-      };
-    } else {
-      updateQuery = { $addToSet: { upvotes: userId } };
-    }
-    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
-      new: true,
-    });
-    if (!answer) {
-      throw new Error("Answer not found!");
-    }
-
-    await User.findByIdAndUpdate(userId, {
-      $inc: { reputation: hasupVoted ? -2 : 2 },
-    });
-    await User.findByIdAndUpdate(answer.author, {
-      $inc: { reputation: hasupVoted ? -10 : 10 },
-    });
-
-    revalidatePath(path);
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+  await castVote("answer", params.answerId, "up");
+  revalidatePath("/", "layout");
 }
 
 export async function downvoteAnswer(params: AnswerVoteParams) {
-  try {
-    await connectToDatabase();
-    const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
-    let updateQuery;
-    if (hasdownVoted) {
-      updateQuery = { $pull: { downvotes: userId } };
-    } else if (hasupVoted) {
-      updateQuery = {
-        $pull: { upvotes: userId },
-        $push: { downvotes: userId },
-      };
-    } else {
-      updateQuery = { $addToSet: { downvotes: userId } };
-    }
-    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
-      new: true,
-    });
-    if (!answer) {
-      throw new Error("Answer not found!");
-    }
-
-    await User.findByIdAndUpdate(userId, {
-      $inc: { reputation: hasdownVoted ? -2 : 2 },
-    });
-    await User.findByIdAndUpdate(answer.author, {
-      $inc: { reputation: hasdownVoted ? -10 : 10 },
-    });
-
-    revalidatePath(path);
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+  await castVote("answer", params.answerId, "down");
+  revalidatePath("/", "layout");
 }
 
 export async function deleteAnswer(params: DeleteAnswerParams) {
-  try {
-    await connectToDatabase();
-    const { answerId, path } = params;
-    const answer = await Answer.findById(answerId);
-    if (!answer) {
-      throw new Error("Answer not found!");
-    }
-    await answer.deleteOne({ _id: answerId });
-    await Question.updateMany(
+  const actor = await requireActor();
+  const id = objectId(params.answerId);
+  await inTransaction(async (session) => {
+    const answer = await Answer.findById(id).session(session);
+    if (!answer) throw new Error("Answer not found.");
+    assertOwner(answer.author, actor);
+    await Answer.deleteOne({ _id: id }, { session });
+    await Question.updateOne(
       { _id: answer.question },
-      { $pull: { answers: answerId } },
+      { $pull: { answers: id } },
+      { session },
     );
-    await Interaction.deleteMany({ answer: answerId });
-    revalidatePath(path);
-  } catch (e) {
-    console.log(e);
-    throw e;
-  }
+    await Interaction.deleteMany({ answer: id }, { session });
+  });
+  revalidatePath("/", "layout");
 }
