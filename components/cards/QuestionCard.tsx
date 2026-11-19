@@ -2,7 +2,7 @@ import Link from "next/link";
 import RenderTag from "@/components/shared/RenderTag";
 import Metric from "@/components/shared/Metric";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
-import { SignedIn } from "@clerk/nextjs";
+import { Show } from "@clerk/nextjs";
 import EditDeleteAction from "../shared/EditDeleteAction";
 
 interface QuestionCardProps {
@@ -45,16 +45,16 @@ export default function QuestionCard({
             {getTimestamp(createdAt)}
           </span>
           <Link href={`/question/${_id}`}>
-            <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
+            <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-2 flex-1 sm:line-clamp-1">
               {title}
             </h3>
           </Link>
         </div>
-        <SignedIn>
+        <Show when="signed-in">
           {showActionButtons && (
             <EditDeleteAction type="Question" itemId={JSON.stringify(_id)} />
           )}
-        </SignedIn>
+        </Show>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2">
         {tags.map((tag) => (
@@ -67,7 +67,7 @@ export default function QuestionCard({
           alt="User"
           value={author.name}
           title={` - asked ${getTimestamp(createdAt)}`}
-          href={`/profile/${author._id}`}
+          href={`/profile/${author.clerkId}`}
           isAuthor={true}
           textStyles="body-medium text-dark400_light700"
         />

@@ -1,10 +1,9 @@
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getUserById } from "@/lib/actions/user.action";
-import { ParamsProps } from "@/types";
 import Profile from "@/components/forms/Profile";
 
-export default async function Page({ params }: ParamsProps) {
-  const { userId } = auth();
+export default async function Page() {
+  const { userId } = await auth();
   if (!userId) return null;
   const mongoUser = await getUserById({ userId });
   return (

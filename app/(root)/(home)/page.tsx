@@ -13,15 +13,18 @@ import {
 import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/shared/Pagination";
 import type { Metadata } from "next";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export const metadata: Metadata = {
   title: "Home | DevOverFlow",
   description: "A community for developers, Join us now!",
 };
 
-export default async function Home({ searchParams }: SearchParamsProps) {
-  const { userId } = auth();
+export default async function Home({
+  searchParams: searchParamsPromise,
+}: SearchParamsProps) {
+  const searchParams = await searchParamsPromise;
+  const { userId } = await auth();
   let result;
   if (searchParams?.filter === "recommended") {
     if (userId) {

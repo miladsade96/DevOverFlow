@@ -4,7 +4,7 @@ import { sidebarLinks } from "@/constants";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { SignedOut, useAuth } from "@clerk/nextjs";
+import { Show, useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 export default function LeftSidebar() {
@@ -18,22 +18,16 @@ export default function LeftSidebar() {
     >
       <div className="flex flex-1 flex-col gap-6">
         {sidebarLinks.map((item) => {
+          if (item.route === "/profile" && !userId) return null;
+          const route =
+            item.route === "/profile" ? `/profile/${userId}` : item.route;
           const isActive =
-            (pathName.includes(item.route) && item.route.length > 1) ||
-            pathName === item.route;
-
-          if (item.route === "/profile") {
-            if (userId) {
-              item.route = `/profile/${userId}`;
-            } else {
-              return null;
-            }
-          }
-
+            pathName === route ||
+            (route !== "/" && pathName.startsWith(`${route}/`));
           return (
             <Link
-              key={item.route}
-              href={item.route}
+              key={route}
+              href={route}
               className={`${isActive ? "primary-gradient rounded-lg text-light-900" : "text-dark300_light900"} flex items-center justify-start gap-4 bg-transparent p-4`}
             >
               <Image
@@ -52,7 +46,7 @@ export default function LeftSidebar() {
           );
         })}
       </div>
-      <SignedOut>
+      <Show when="signed-out">
         <div className="flex flex-col gap-3">
           <Link href="/sign-in">
             <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
@@ -82,7 +76,7 @@ export default function LeftSidebar() {
             </Button>
           </Link>
         </div>
-      </SignedOut>
+      </Show>
     </section>
   );
 }

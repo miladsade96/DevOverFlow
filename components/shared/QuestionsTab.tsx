@@ -3,7 +3,8 @@ import { getUserQuestions } from "@/lib/actions/user.action";
 import QuestionCard from "@/components/cards/QuestionCard";
 import Pagination from "@/components/shared/Pagination";
 
-interface QuestionsTabProps extends SearchParamsProps {
+interface QuestionsTabProps {
+  searchParams: Awaited<SearchParamsProps["searchParams"]>;
   userId: string;
   clerkId?: string | undefined;
 }

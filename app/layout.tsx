@@ -1,9 +1,10 @@
+import { missingSettings } from "@/lib/config";
 import { ClerkProvider } from "@clerk/nextjs";
 import "../styles/globals.css";
 import "../styles/prism.css";
 import React from "react";
 import { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google"; // eslint-disable-line
+import { Inter, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeProvider";
 
 const inter = Inter({
@@ -25,12 +26,19 @@ export const metadata: Metadata = {
   icons: { icon: "/assets/images/site-logo.svg" },
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // @ts-ignore
+  if (missingSettings().length)
+    return (
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    );
   return (
     <html lang="en">
       <body className={`${inter.variable} ${spaceGrotesk.variable}`}>

@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   description: "All tags submitted on DevOverFlow.",
 };
 
-export default async function Page({ searchParams }: SearchParamsProps) {
+export default async function Page({
+  searchParams: searchParamsPromise,
+}: SearchParamsProps) {
+  const searchParams = await searchParamsPromise;
   const { tags, isNext } = await getAllTags({
     searchQuery: searchParams.q,
     filter: searchParams.filter,

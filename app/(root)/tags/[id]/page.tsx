@@ -5,7 +5,12 @@ import NoResult from "@/components/shared/NoResult";
 import { URLProps } from "@/types";
 import Pagination from "@/components/shared/Pagination";
 
-export default async function Page({ params, searchParams }: URLProps) {
+export default async function Page({
+  params: paramsPromise,
+  searchParams: searchParamsPromise,
+}: URLProps) {
+  const params = await paramsPromise;
+  const searchParams = await searchParamsPromise;
   const result = await getQuestionsByTagId({
     tagId: params.id,
     searchQuery: searchParams.q,
