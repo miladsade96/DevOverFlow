@@ -1,7 +1,8 @@
 import { URLProps } from "@/types";
 import { getUserInfo } from "@/lib/actions/user.action";
 import Image from "next/image";
-import { auth, SignedIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { Show } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,13 +14,14 @@ import AnswersTab from "@/components/shared/AnswersTab";
 import { Metadata, ResolvingMetadata } from "next";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata(
-  { params }: Props,
+  { params: paramsPromise }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
+  const params = await paramsPromise;
   const { user } = await getUserInfo({ userId: params.id });
   return {
     title: `${user.name}'s Profile`,
@@ -27,8 +29,13 @@ export async function generateMetadata(
   };
 }
 
-export default async function Page({ params, searchParams }: URLProps) {
-  const { userId: clerkId } = auth();
+export default async function Page({
+  params: paramsPromise,
+  searchParams: searchParamsPromise,
+}: URLProps) {
+  const params = await paramsPromise;
+  const searchParams = await searchParamsPromise;
+  const { userId: clerkId } = await auth();
   const { user, totalQuestions, totalAnswers, badgeCounts } = await getUserInfo(
     {
       userId: params.id,
@@ -77,7 +84,7 @@ export default async function Page({ params, searchParams }: URLProps) {
           </div>
         </div>
         <div className="flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3">
-          <SignedIn>
+          <Show when="signed-in">
             {clerkId === user.clerkId && (
               <Link href="/profile/edit">
                 <Button className="paragraph-medium btn-secondary text-dark300_light900 min-h-[46px] min-w-[175px] px-4 py-3">
@@ -85,7 +92,7 @@ export default async function Page({ params, searchParams }: URLProps) {
                 </Button>
               </Link>
             )}
-          </SignedIn>
+          </Show>
         </div>
       </div>
       <Stats

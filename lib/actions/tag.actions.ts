@@ -10,19 +10,35 @@ import User from "@/database/user.model";
 import Question from "@/database/question.model";
 import Tag, { ITag } from "@/database/tag.model";
 import { FilterQuery } from "mongoose";
+import Interaction from "@/database/interaction.model";
+import { Types } from "mongoose";
+import { escapeRegex, objectId, pagination } from "@/lib/query";
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
     await connectToDatabase();
     const { userId } = params;
+    objectId(userId);
     const user = await User.findById(userId);
     if (!user) throw new Error("User not found!");
-    // It is not completed yet
-    return [
-      { _id: "1", name: "tag1" },
-      { _id: "2", name: "tag2" },
-      { _id: "3", name: "tag3" },
-    ];
+    const tags = await Interaction.aggregate([
+      { $match: { user: new Types.ObjectId(userId) } },
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: Math.min(10, Math.max(1, params.limit || 3)) },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "_id",
+          foreignField: "_id",
+          as: "tag",
+        },
+      },
+      { $unwind: "$tag" },
+      { $project: { _id: 1, name: "$tag.name" } },
+    ]);
+    return tags;
   } catch (e) {
     console.log(e);
     throw e;
@@ -33,16 +49,18 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     await connectToDatabase();
     const { searchQuery, filter, page = 1, pageSize = 10 } = params;
-    const skipAmount = (page - 1) * pageSize;
+    const { skipAmount, limit } = pagination(page, pageSize);
     const query: FilterQuery<typeof Tag> = {};
     if (searchQuery) {
-      query.$or = [{ name: { $regex: new RegExp(searchQuery, "i") } }];
+      query.$or = [
+        { name: { $regex: new RegExp(escapeRegex(searchQuery), "i") } },
+      ];
     }
 
-    let sortOptions = {};
+    let sortOptions: Record<string, 1 | -1> = { createdOn: -1, _id: -1 };
     switch (filter) {
       case "popular":
-        sortOptions = { questions: -1 };
+        sortOptions = { questionCount: -1, name: 1 };
         break;
       case "recent":
         sortOptions = { createdOn: -1 };
@@ -57,10 +75,18 @@ export async function getAllTags(params: GetAllTagsParams) {
         break;
     }
 
-    const tags = await Tag.find(query)
-      .skip(skipAmount)
-      .limit(pageSize)
-      .sort(sortOptions);
+    const tags = await Tag.aggregate([
+      { $match: query },
+      {
+        $addFields: {
+          questionCount: { $size: { $ifNull: ["$questions", []] } },
+        },
+      },
+      { $sort: sortOptions },
+      { $skip: skipAmount },
+      { $limit: limit },
+      { $project: { questionCount: 0 } },
+    ]);
 
     const totalTags = await Tag.countDocuments(query);
     const isNext = totalTags > skipAmount + tags.length;
@@ -76,18 +102,19 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
   try {
     await connectToDatabase();
     const { tagId, searchQuery, page = 1, pageSize = 10 } = params;
-    const skipAmount = (page - 1) * pageSize;
+    const { skipAmount, limit } = pagination(page, pageSize);
+    objectId(tagId);
     const tagFilter: FilterQuery<ITag> = { _id: tagId };
     const tag = await Tag.findOne(tagFilter).populate({
       path: "questions",
       model: Question,
       match: searchQuery
-        ? { title: { $regex: searchQuery, $options: "i" } }
+        ? { title: { $regex: escapeRegex(searchQuery), $options: "i" } }
         : {},
       options: {
         sort: { createdAt: -1 },
         skip: skipAmount,
-        limit: pageSize + 1, // +1 to check if there is the next page or not
+        limit: limit + 1, // +1 to check if there is the next page or not
       },
       populate: [
         { path: "tags", model: Tag, select: "_id name" },
@@ -98,8 +125,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
       throw new Error("Tag not found!");
     }
 
-    const isNext = tag.questions.length > pageSize;
-    const questions = tag.questions;
+    const isNext = tag.questions.length > limit;
+    const questions = tag.questions.slice(0, limit);
     return { tagTitle: tag.name, questions, isNext };
   } catch (e) {
     console.log(e);

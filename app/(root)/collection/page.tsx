@@ -4,7 +4,7 @@ import { QuestionFilters } from "@/constants/filters";
 import NoResult from "@/components/shared/NoResult";
 import QuestionCard from "@/components/cards/QuestionCard";
 import { getSavedQuestions } from "@/lib/actions/user.action";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { SearchParamsProps } from "@/types";
 import Pagination from "@/components/shared/Pagination";
 import type { Metadata } from "next";
@@ -14,8 +14,11 @@ export const metadata: Metadata = {
   description: "Collect useful questions that you like",
 };
 
-export default async function Home({ searchParams }: SearchParamsProps) {
-  const { userId } = auth();
+export default async function Home({
+  searchParams: searchParamsPromise,
+}: SearchParamsProps) {
+  const searchParams = await searchParamsPromise;
+  const { userId } = await auth();
   if (!userId) {
     return null;
   }

@@ -1,20 +1,27 @@
 import { getQuestionById } from "@/lib/actions/question.action";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import Metric from "@/components/shared/Metric";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import ParseHTML from "@/components/shared/ParseHTML";
 import RenderTag from "@/components/shared/RenderTag";
 import Answer from "@/components/forms/Answer";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getUserById } from "@/lib/actions/user.action";
 import AllAnswers from "@/components/shared/AllAnswers";
 import Votes from "../../../../components/shared/Votes";
 import { URLProps } from "@/types";
 
-export default async function Page({ params, searchParams }: URLProps) {
+export default async function Page({
+  params: paramsPromise,
+  searchParams: searchParamsPromise,
+}: URLProps) {
+  const params = await paramsPromise;
+  const searchParams = await searchParamsPromise;
   const result = await getQuestionById({ questionId: params.id });
-  const { userId: clerkId } = auth();
+  if (!result) notFound();
+  const { userId: clerkId } = await auth();
   let mongoUser;
   if (clerkId) {
     mongoUser = await getUserById({ userId: clerkId });
@@ -91,16 +98,16 @@ export default async function Page({ params, searchParams }: URLProps) {
         ))}
       </div>
       <AllAnswers
-        questionId={result._id}
-        userId={mongoUser?._id}
+        questionId={String(result._id)}
+        userId={mongoUser ? String(mongoUser._id) : undefined}
         totalAnswers={result.answers.length}
         page={searchParams?.page}
         filter={searchParams?.filter}
       />
       <Answer
-        question={result.content}
+        question={`${result.title}\n${result.content}`.slice(0, 2000)}
         questionId={JSON.stringify(result._id)}
-        authorId={JSON.stringify(mongoUser?._id)}
+        authorId={mongoUser ? JSON.stringify(String(mongoUser._id)) : ""}
       />
     </>
   );

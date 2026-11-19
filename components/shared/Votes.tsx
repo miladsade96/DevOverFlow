@@ -9,7 +9,7 @@ import {
 } from "@/lib/actions/question.action";
 import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { viewQuestion } from "@/lib/actions/interaction.action";
 import { toast } from "@/components/ui/use-toast";
 
@@ -30,143 +30,142 @@ export default function Votes({
   userId,
   upvotes,
   hasupVoted,
-  hasdownVoted,
   downvotes,
+  hasdownVoted,
   hasSaved,
 }: VotesProps) {
   const pathname = usePathname();
   const router = useRouter();
-
-  async function handleSave() {
-    await toggleSaveQuestion({
-      questionId: JSON.parse(itemId),
-      userId: JSON.parse(userId),
-      path: pathname,
-    });
-
-    return toast({
-      title: `Question ${!hasSaved ? "Saved in" : "Removed from"} your collection.`,
-      variant: !hasSaved ? "default" : "destructive",
-    });
-  }
-
-  async function handleVote(action: string) {
-    if (!userId) {
-      return toast({
-        title: "Please log in.",
-        description: "You must be logged in to perform this action!",
-      });
+  const [pending, setPending] = useState(false);
+  const locked = useRef(false);
+  const actorId = userId ? JSON.parse(userId) : null;
+  const id = JSON.parse(itemId);
+  async function act(action: "save" | "up" | "down") {
+    if (!actorId) {
+      toast({ title: "Please sign in to continue." });
+      return;
     }
-    if (action === "upvote") {
-      if (type === "Question") {
-        await upvoteQuestion({
-          questionId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasupVoted,
-          hasdownVoted,
+    if (locked.current) return;
+    locked.current = true;
+    setPending(true);
+    try {
+      if (action === "save")
+        await toggleSaveQuestion({
+          questionId: id,
+          userId: actorId,
           path: pathname,
         });
-      } else if (type === "Answer") {
-        await upvoteAnswer({
-          answerId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
+      else {
+        const vote =
+          type === "Question"
+            ? action === "up"
+              ? upvoteQuestion
+              : downvoteQuestion
+            : action === "up"
+              ? upvoteAnswer
+              : downvoteAnswer;
+        await vote({
+          questionId: id,
+          answerId: id,
+          userId: actorId,
           hasupVoted,
           hasdownVoted,
           path: pathname,
         });
       }
-      return toast({
-        title: `${hasupVoted ? "Upvote removed" : "Upvoted successfully"}`,
-        variant: hasupVoted ? "destructive" : "default",
+      router.refresh();
+      toast({
+        title:
+          action === "save"
+            ? hasSaved
+              ? "Removed from your collection"
+              : "Saved to your collection"
+            : "Vote updated",
       });
-    }
-    if (action === "downvote") {
-      if (type === "Question") {
-        await downvoteQuestion({
-          questionId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasupVoted,
-          hasdownVoted,
-          path: pathname,
-        });
-      } else if (type === "Answer") {
-        await downvoteAnswer({
-          answerId: JSON.parse(itemId),
-          userId: JSON.parse(userId),
-          hasupVoted,
-          hasdownVoted,
-          path: pathname,
-        });
-      }
-      return toast({
-        title: `${hasdownVoted ? "Downvote removed" : "Downvoted successfully"}`,
-        variant: hasupVoted ? "destructive" : "default",
+    } catch {
+      toast({
+        title: "Could not save your change. Please try again.",
+        variant: "destructive",
       });
+    } finally {
+      locked.current = false;
+      setPending(false);
     }
   }
-
   useEffect(() => {
-    viewQuestion({
-      questionId: JSON.parse(itemId),
-      userId: userId ? JSON.parse(userId) : undefined,
-    });
-  }, [itemId, userId, pathname, router]);
-
+    if (type === "Question")
+      void viewQuestion({ questionId: id, userId: undefined }).catch(
+        () => undefined,
+      );
+  }, [type, id]);
   return (
-    <div className="flex gap-5">
+    <div className="flex gap-5" aria-busy={pending}>
       <div className="flex-center gap-2.5">
-        <div className="flex-center gap-1.5">
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => act("up")}
+          aria-label="Upvote"
+          aria-pressed={hasupVoted}
+          className="flex-center gap-1.5 rounded p-1 focus-visible:outline focus-visible:outline-2"
+        >
           <Image
             src={
               hasupVoted
                 ? "/assets/icons/upvoted.svg"
                 : "/assets/icons/upvote.svg"
             }
-            alt="upvote"
-            height={18}
+            alt=""
             width={18}
-            className="cursor-pointer"
-            onClick={() => handleVote("upvote")}
+            height={18}
           />
-          <div className="flex-center background-light700_dark400 min-w-[18px] rounded-sm p-1">
-            <p className="subtle-medium text-dark400_light900">
-              {formatAndDivideNumber(upvotes)}
-            </p>
-          </div>
-        </div>
-        <div className="flex-center gap-1.5">
+          <span className="text-dark400_light900">
+            {formatAndDivideNumber(upvotes)}
+          </span>
+        </button>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => act("down")}
+          aria-label="Downvote"
+          aria-pressed={hasdownVoted}
+          className="flex-center gap-1.5 rounded p-1 focus-visible:outline focus-visible:outline-2"
+        >
           <Image
             src={
               hasdownVoted
                 ? "/assets/icons/downvoted.svg"
                 : "/assets/icons/downvote.svg"
             }
-            alt="downvote"
-            height={18}
+            alt=""
             width={18}
-            className="cursor-pointer"
-            onClick={() => handleVote("downvote")}
+            height={18}
           />
-          <div className="flex-center background-light700_dark400 min-w-[18px] rounded-sm p-1">
-            <p className="subtle-medium text-dark400_light900">
-              {formatAndDivideNumber(downvotes)}
-            </p>
-          </div>
-        </div>
+          <span className="text-dark400_light900">
+            {formatAndDivideNumber(downvotes)}
+          </span>
+        </button>
       </div>
       {type === "Question" && (
-        <Image
-          src={
-            hasSaved
-              ? "/assets/icons/star-filled.svg"
-              : "/assets/icons/star-red.svg"
-          }
-          alt="star"
-          height={18}
-          width={18}
-          className="cursor-pointer"
-          onClick={handleSave}
-        />
+        <button
+          type="button"
+          disabled={pending}
+          aria-label="Save question"
+          aria-pressed={!!hasSaved}
+          onClick={() => act("save")}
+          className="rounded p-1 focus-visible:outline focus-visible:outline-2"
+        >
+          <Image
+            src={
+              hasSaved
+                ? "/assets/icons/star-filled.svg"
+                : "/assets/icons/star-red.svg"
+            }
+            alt=""
+            width={18}
+            height={18}
+          />
+        </button>
       )}
     </div>
   );

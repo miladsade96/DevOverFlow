@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   description: "Community of world's top developers and engineers",
 };
 
-export default async function Page({ searchParams }: SearchParamsProps) {
+export default async function Page({
+  searchParams: searchParamsPromise,
+}: SearchParamsProps) {
+  const searchParams = await searchParamsPromise;
   const result = await getAllUsers({
     searchQuery: searchParams.q,
     filter: searchParams.filter,

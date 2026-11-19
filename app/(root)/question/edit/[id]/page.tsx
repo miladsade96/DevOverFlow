@@ -1,21 +1,25 @@
 import Question from "@/components/forms/Question";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { getUserById } from "@/lib/actions/user.action";
 import { getQuestionById } from "@/lib/actions/question.action";
+import { notFound } from "next/navigation";
 import { ParamsProps } from "@/types";
 
-export default async function Page({ params }: ParamsProps) {
-  const { userId } = auth();
+export default async function Page({ params: paramsPromise }: ParamsProps) {
+  const params = await paramsPromise;
+  const { userId } = await auth();
   if (!userId) return null;
   const mongoUser = await getUserById({ userId });
   const result = await getQuestionById({ questionId: params.id });
+  if (!result || String(result.author._id) !== String(mongoUser?._id))
+    notFound();
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">Edit Question</h1>
       <div className="mt-9">
         <Question
           type="Edit"
-          mongoUserId={mongoUser._id}
+          mongoUserId={JSON.stringify(mongoUser._id)}
           questionDetails={JSON.stringify(result)}
         />
       </div>

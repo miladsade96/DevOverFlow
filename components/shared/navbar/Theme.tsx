@@ -45,8 +45,6 @@ function Theme() {
               key={item.value}
               onClick={() => {
                 setMode(item.value);
-                if (item.value !== "system") localStorage.theme = item.value;
-                else localStorage.removeItem("theme");
               }}
               className="flex cursor-pointer items-center gap-4 px-2.5 py-2 focus:bg-light-800"
             >

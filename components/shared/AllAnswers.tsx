@@ -11,7 +11,7 @@ import Pagination from "@/components/shared/Pagination";
 
 interface AllAnswersProps {
   questionId: string;
-  userId: string;
+  userId?: string;
   totalAnswers: number;
   page?: string;
   filter?: string;
@@ -67,12 +67,16 @@ export default async function AllAnswers({
               <div className="flex justify-end">
                 <Votes
                   type="Answer"
-                  itemId={JSON.stringify(answer.id)}
-                  userId={JSON.stringify(userId)}
+                  itemId={JSON.stringify(String(answer._id))}
+                  userId={userId ? JSON.stringify(userId) : ""}
                   upvotes={answer.upvotes.length}
-                  hasupVoted={answer.upvotes.includes(userId)}
+                  hasupVoted={answer.upvotes.some(
+                    (id: unknown) => String(id) === userId,
+                  )}
                   downvotes={answer.downvotes.length}
-                  hasdownVoted={answer.downvotes.includes(userId)}
+                  hasdownVoted={answer.downvotes.some(
+                    (id: unknown) => String(id) === userId,
+                  )}
                 />
               </div>
             </div>
