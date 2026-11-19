@@ -37,3 +37,8 @@ next-env.d.ts
 
 # IDE
 .idea
+/audit-*.json
+/test-results/
+/qa/
+
+*.log
